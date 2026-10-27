@@ -1,0 +1,48 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+Oveja Negra: tienda de ropa para mascotas. Next.js 16 (App Router, React 19, Tailwind 4) + Supabase (Postgres, Auth,
+Storage; proyecto `nxsojfkeonfjmmpklgnr`) + Mercado Pago. UI, comentarios y documentación en español.
+El diseño visual es provisional: no invertir en estilos hasta que se defina.
+
+## Comandos
+
+```bash
+npm run dev                          # http://localhost:3000 (requiere .env.local, ver .env.example)
+npx tsc --noEmit && npm run lint     # verificación
+npm run build                        # detecta errores de prerender (cacheComponents)
+npx next typegen                     # regenera PageProps/LayoutProps tras crear rutas
+npx supabase db push                 # aplica supabase/migrations (tras `supabase link --project-ref nxsojfkeonfjmmpklgnr`)
+```
+
+No hay tests automatizados.
+
+@AGENTS.md
+
+## Arquitectura
+
+- **Esquema:** `supabase/migrations/*.sql` es la fuente de verdad (tablas, RLS, Storage, funciones). Todo cambio de
+  esquema va en una migración nueva. `src/lib/types.ts` son tipos escritos a mano que deben seguir al SQL.
+- **Clientes Supabase** (`src/lib/supabase/`): `client.ts` (navegador), `server.ts` → `createClient()` (usuario actual,
+  respeta RLS) y `createServiceClient()` (service role, salta RLS: **sólo** en checkout y webhook, con datos ya
+  validados), `proxy.ts` (renueva la sesión; `src/proxy.ts` es el "middleware" de Next 16 y exige sesión en
+  `/checkout`, `/pedido` y `/admin`). Usa siempre `auth.getUser()` (valida el token), no `getSession()` de supabase-js.
+- **Roles:** `profiles.role` (`cliente`|`admin`) + función SQL `is_admin()` usada por las políticas RLS. El rol no es
+  editable por el usuario (sólo `grant update (full_name, phone)`). En el servidor, `requireAdmin()` de `lib/auth.ts`
+  antes de cada acción de admin (RLS lo vuelve a verificar).
+- **Compra:** carrito en `localStorage` (`lib/cart.ts`, `useSyncExternalStore`); sus precios son sólo para mostrar.
+  `placeOrder` (`app/checkout/actions.ts`) valida con zod, recalcula precio/stock desde la base, inserta `orders` +
+  `order_items` con la service role y crea la preferencia de Mercado Pago (`lib/mercadopago.ts`, `external_reference` =
+  id del pedido). El webhook valida `x-signature`, consulta el pago a MP y llama a `confirm_order_payment` (SQL,
+  idempotente, descuenta stock; ejecutable sólo por service role). Marcar "pagado" a mano desde el admin no descuenta stock.
+- **Fotos:** bucket público `productos`, ruta `<product_id>/<uuid>.<ext>`; URL con `imageUrl()` de `lib/format.ts`.
+
+## Trampas
+
+- **Next.js 16:** ver `AGENTS.md`; la doc está en `node_modules/next/dist/docs/`. `middleware` ahora es `proxy`.
+- **`cacheComponents: true`:** todo lo que lea cookies, `params` o `searchParams` va en un componente async dentro de
+  `<Suspense>` (patrón usado en cada `page.tsx`); si no, el build falla con "blocking route".
+- Las páginas no pueden exportar nada más que lo permitido por Next: utilidades compartidas van en `src/lib` o `src/components`.
+- Supabase devuelve `numeric` como string o number según el caso: convertir con `Number()` antes de calcular.
+- Mercado Pago rechaza `back_urls`/`notification_url` en localhost; `createCheckout` los omite en dev.
