@@ -1,4 +1,4 @@
--- Oveja Negra: tienda de ropa para mascotas. Esquema inicial.
+-- Oveja Negra: tienda de ropa para perritos y gatitos. Esquema inicial.
 -- Catálogo público, clientes con Supabase Auth, pedidos y panel de administración.
 -- Seguridad: RLS en todas las tablas. Los pedidos los crea el servidor (service role), nunca el navegador,
 -- para que precios y stock se calculen siempre desde la base.
@@ -8,17 +8,31 @@
 create table public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
   full_name text not null default '' check (char_length(full_name) <= 120),
+  age int check (age between 0 and 120),
+  -- Rango de cliente: lo asigna el admin, el cliente no lo puede cambiar.
+  customer_tier text not null default 'basico' check (customer_tier in ('basico', 'habitual', 'super')),
+  address text not null default '' check (char_length(address) <= 200),
+  city text not null default '' check (char_length(city) <= 80),
+  region text not null default '' check (char_length(region) <= 80),
   phone text not null default '' check (char_length(phone) <= 40),
   role text not null default 'cliente' check (role in ('cliente', 'admin')),
   created_at timestamptz not null default now()
 );
 
--- Crea el perfil al registrarse.
+-- Crea el perfil al registrarse con los datos del formulario (metadata de signUp, ya validada en el servidor).
+-- left() y la conversión de la edad evitan que una metadata inválida haga fallar el registro.
 create function public.handle_new_user() returns trigger
 language plpgsql security definer set search_path = '' as $$
+declare
+  m jsonb := coalesce(new.raw_user_meta_data, '{}');
+  v_age int;
 begin
-  insert into public.profiles (id, full_name)
-  values (new.id, coalesce(new.raw_user_meta_data ->> 'full_name', ''));
+  if (m ->> 'age') ~ '^\d{1,3}$' and (m ->> 'age')::int <= 120 then
+    v_age := (m ->> 'age')::int;
+  end if;
+  insert into public.profiles (id, full_name, age, address, city, region, phone)
+  values (new.id, left(coalesce(m ->> 'full_name', ''), 120), v_age, left(coalesce(m ->> 'address', ''), 200),
+    left(coalesce(m ->> 'city', ''), 80), left(coalesce(m ->> 'region', ''), 80), left(coalesce(m ->> 'phone', ''), 40));
   return new;
 end;
 $$;
@@ -60,7 +74,7 @@ create index products_featured_idx on public.products (created_at desc) where ac
 create table public.product_variants (
   id bigint generated always as identity primary key,
   product_id bigint not null references public.products (id) on delete cascade,
-  size text not null check (size in ('XS', 'S', 'M', 'L', 'XL', 'XXL', 'Única')),
+  size text not null check (size in ('XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL')),
   color text not null default '' check (char_length(color) <= 40),
   sku text unique,
   stock int not null default 0 check (stock >= 0),
@@ -144,11 +158,25 @@ alter table public.product_images enable row level security;
 alter table public.orders enable row level security;
 alter table public.order_items enable row level security;
 
--- Perfiles: cada uno ve y edita el suyo; el rol no se puede cambiar desde el cliente.
+-- Perfiles: cada uno ve y edita el suyo; rol y rango de cliente sólo los cambia el admin.
 create policy "perfil propio: leer" on public.profiles for select using (id = auth.uid() or public.is_admin());
 create policy "perfil propio: editar" on public.profiles for update using (id = auth.uid()) with check (id = auth.uid());
 revoke update on public.profiles from anon, authenticated;
-grant update (full_name, phone) on public.profiles to authenticated;
+grant update (full_name, age, address, city, region, phone) on public.profiles to authenticated;
+
+-- Rango de cliente: sólo vía esta función (un permiso de columna dejaría al cliente cambiarse el suyo,
+-- porque la política "perfil propio: editar" también lo permitiría).
+create function public.set_customer_tier(p_user_id uuid, p_tier text) returns void
+language plpgsql security definer set search_path = '' as $$
+begin
+  if not public.is_admin() then
+    raise exception 'Sólo para administradores';
+  end if;
+  update public.profiles set customer_tier = p_tier where id = p_user_id;
+end;
+$$;
+revoke execute on function public.set_customer_tier(uuid, text) from public, anon;
+grant execute on function public.set_customer_tier(uuid, text) to authenticated;
 
 -- Catálogo: lectura pública de lo activo; escritura sólo admin.
 create policy "categorías: leer" on public.categories for select using (true);
@@ -187,5 +215,4 @@ create policy "fotos: admin borra" on storage.objects for delete to authenticate
 -- ------------------------------------------------------------------ datos iniciales
 
 insert into public.categories (slug, name, position) values
-  ('abrigos', 'Abrigos', 1), ('sweaters', 'Sweaters', 2), ('camisetas', 'Camisetas', 3),
-  ('impermeables', 'Impermeables', 4), ('disfraces', 'Disfraces', 5), ('accesorios', 'Accesorios', 6);
+  ('impermeables', 'Impermeables', 1), ('camisas', 'Camisas', 2), ('polars', 'Polars', 3), ('disfraces', 'Disfraces', 4);

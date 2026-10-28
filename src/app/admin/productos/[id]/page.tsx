@@ -39,7 +39,7 @@ async function EditProduct({ params }: { params: Promise<{ id: string }> }) {
       </section>
       <form action={deleteProduct.bind(null, p.id)} className="border-t pt-4">
         <button className="text-sm text-red-600 hover:underline">Eliminar producto</button>
-        <p className="text-xs text-neutral-500">Los pedidos anteriores conservan nombre, talla y precio.</p>
+        <p className="text-xs text-cafe/70">Los pedidos anteriores conservan nombre, talla y precio.</p>
       </form>
     </div>
   );

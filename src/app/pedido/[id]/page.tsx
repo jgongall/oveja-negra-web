@@ -19,13 +19,13 @@ async function OrderDetail({ params }: { params: Promise<{ id: string }> }) {
     <div className="flex max-w-2xl flex-col gap-6">
       <div>
         <h1 className="text-2xl font-bold">Pedido</h1>
-        <p className="text-sm text-neutral-500">#{order.id.slice(0, 8)} · {dateTime(order.created_at)}</p>
+        <p className="text-sm text-cafe/70">#{order.id.slice(0, 8)} · {dateTime(order.created_at)}</p>
       </div>
       <div className="rounded border p-4">
         <div className="font-semibold">{ORDER_STATUS[order.status]}</div>
         {order.status === "pendiente" && (
           <>
-            <p className="mt-1 text-sm text-neutral-600">
+            <p className="mt-1 text-sm text-cafe/70">
               Si ya pagaste, la confirmación de Mercado Pago puede tardar unos minutos.
             </p>
             <PayButton orderId={order.id} />
@@ -45,7 +45,7 @@ async function OrderDetail({ params }: { params: Promise<{ id: string }> }) {
         <div className="font-semibold">Envío</div>
         <div>{order.full_name} · {order.phone}</div>
         <div>{a.street}, {a.city}{a.region ? `, ${a.region}` : ""} {a.postal_code}</div>
-        {a.notes && <div className="text-neutral-600">{a.notes}</div>}
+        {a.notes && <div className="text-cafe/70">{a.notes}</div>}
       </div>
     </div>
   );

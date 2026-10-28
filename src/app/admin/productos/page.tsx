@@ -12,7 +12,7 @@ async function Products() {
 
   return (
     <table className="w-full text-sm">
-      <thead className="text-left text-neutral-500">
+      <thead className="text-left text-cafe/70">
         <tr><th className="py-2">Producto</th><th>Categoría</th><th>Precio</th><th>Stock</th><th>Estado</th></tr>
       </thead>
       <tbody className="divide-y">
@@ -35,7 +35,7 @@ export default function AdminProductsPage() {
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Productos</h1>
-        <Link href="/admin/productos/nuevo" className="rounded bg-black px-4 py-2 text-sm text-white">Nuevo producto</Link>
+        <Link href="/admin/productos/nuevo" className="rounded bg-cafe hover:bg-cafe-oscuro px-4 py-2 text-sm text-white">Nuevo producto</Link>
       </div>
       <Suspense fallback={<p>Cargando…</p>}><Products /></Suspense>
     </div>

@@ -17,6 +17,7 @@ export default function AdminLayout({ children }: LayoutProps<"/admin">) {
         <span className="font-semibold">Administración</span>
         <Link href="/admin" className="hover:underline">Pedidos</Link>
         <Link href="/admin/productos" className="hover:underline">Productos</Link>
+        <Link href="/admin/catalogo" className="hover:underline">Subir catálogo</Link>
         <Link href="/admin/categorias" className="hover:underline">Categorías</Link>
       </nav>
       <Suspense fallback={<p>Cargando…</p>}><Guard>{children}</Guard></Suspense>

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Oveja Negra: tienda de ropa para mascotas. Next.js 16 (App Router, React 19, Tailwind 4) + Supabase (Postgres, Auth,
 Storage; proyecto `nxsojfkeonfjmmpklgnr`) + Mercado Pago. UI, comentarios y documentación en español.
-El diseño visual es provisional: no invertir en estilos hasta que se defina.
+Identidad visual: assets del usuario en `public/marca` y colores de marca en `globals.css` (usar `text-cafe`, `bg-rosa`, etc.).
 
 ## Comandos
 

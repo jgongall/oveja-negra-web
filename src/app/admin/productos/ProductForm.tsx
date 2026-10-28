@@ -62,7 +62,7 @@ export function ProductForm({ product: p, categories }: { product?: ProductWithD
       </div>
 
       <h2 className="mt-4 font-semibold">Tallas, colores y stock</h2>
-      <div className="grid grid-cols-[90px_1fr_1fr_90px_120px_auto] gap-2 text-xs text-neutral-500">
+      <div className="grid grid-cols-[90px_1fr_1fr_90px_120px_auto] gap-2 text-xs text-cafe/70">
         <span>Talla</span><span>Color</span><span>SKU</span><span>Stock</span><span>Precio distinto</span><span />
       </div>
       {rows.map((r) => (
@@ -82,10 +82,10 @@ export function ProductForm({ product: p, categories }: { product?: ProductWithD
 
       {msg.error && <p className="text-sm text-red-600">{msg.error}</p>}
       {msg.message && <p className="text-sm text-green-700">{msg.message}</p>}
-      <button disabled={pending} className="self-start rounded bg-black px-6 py-2 text-white disabled:opacity-50">
+      <button disabled={pending} className="self-start rounded bg-cafe hover:bg-cafe-oscuro px-6 py-2 text-white disabled:opacity-50">
         {pending ? "Guardando…" : p ? "Guardar cambios" : "Crear producto"}
       </button>
-      {!p && <p className="text-xs text-neutral-500">Las fotos se agregan después de crear el producto.</p>}
+      {!p && <p className="text-xs text-cafe/70">Las fotos se agregan después de crear el producto.</p>}
     </form>
   );
 }

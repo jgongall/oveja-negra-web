@@ -9,7 +9,7 @@ async function Categories() {
     <ul className="divide-y">
       {categories.map((c) => (
         <li key={c.id} className="flex items-center justify-between py-2">
-          <span>{c.name} <span className="text-xs text-neutral-500">/{c.slug} · orden {c.position}</span></span>
+          <span>{c.name} <span className="text-xs text-cafe/70">/{c.slug} · orden {c.position}</span></span>
           <form action={deleteCategory.bind(null, c.id)}>
             <button className="text-sm text-red-600 hover:underline">Borrar</button>
           </form>
@@ -25,7 +25,7 @@ export default function CategoriasPage() {
       <h1 className="text-2xl font-bold">Categorías</h1>
       <CategoryForm />
       <Suspense fallback={<p>Cargando…</p>}><Categories /></Suspense>
-      <p className="text-xs text-neutral-500">Al borrar una categoría, sus productos quedan sin categoría.</p>
+      <p className="text-xs text-cafe/70">Al borrar una categoría, sus productos quedan sin categoría.</p>
     </div>
   );
 }

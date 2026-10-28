@@ -8,7 +8,7 @@ export function PayButton({ orderId }: { orderId: string }) {
   const [pending, start] = useTransition();
   return (
     <div className="mt-3">
-      <button disabled={pending} className="rounded bg-black px-4 py-2 text-white disabled:opacity-50"
+      <button disabled={pending} className="rounded bg-cafe hover:bg-cafe-oscuro px-4 py-2 text-white disabled:opacity-50"
         onClick={() => start(async () => {
           const r = await retryPayment(orderId);
           if (r.url) window.location.href = r.url;

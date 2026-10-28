@@ -19,13 +19,13 @@ export default function CarritoPage() {
       <h1 className="text-2xl font-bold">Carrito</h1>
       {lines.map((l) => (
         <div key={l.variantId} className="flex items-center gap-4 border-b pb-4">
-          <div className="h-20 w-20 overflow-hidden rounded bg-neutral-100">
+          <div className="h-20 w-20 overflow-hidden rounded bg-crema">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             {l.image && <img src={imageUrl(l.image)} alt="" className="h-full w-full object-cover" />}
           </div>
           <div className="flex-1">
             <Link href={`/producto/${l.slug}`} className="font-medium hover:underline">{l.name}</Link>
-            <div className="text-sm text-neutral-600">Talla {l.size}{l.color ? ` · ${l.color}` : ""} · {money(l.price)}</div>
+            <div className="text-sm text-cafe/70">Talla {l.size}{l.color ? ` · ${l.color}` : ""} · {money(l.price)}</div>
           </div>
           <input type="number" min={1} max={99} value={l.quantity} aria-label="Cantidad"
             onChange={(e) => cart.setQuantity(l.variantId, Number(e.target.value) || 1)} className="w-16 rounded border px-2 py-1" />
@@ -35,9 +35,9 @@ export default function CarritoPage() {
       ))}
       <div className="flex items-center justify-end gap-6">
         <div className="text-lg">Total: <b>{money(cartTotal(lines))}</b></div>
-        <Link href="/checkout" className="rounded bg-black px-6 py-2 text-white">Continuar</Link>
+        <Link href="/checkout" className="rounded bg-cafe hover:bg-cafe-oscuro px-6 py-2 text-white">Continuar</Link>
       </div>
-      <p className="text-right text-xs text-neutral-500">Precios y stock se confirman al pagar.</p>
+      <p className="text-right text-xs text-cafe/70">Precios y stock se confirman al pagar.</p>
     </div>
   );
 }

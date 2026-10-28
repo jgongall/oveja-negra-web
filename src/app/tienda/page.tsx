@@ -18,7 +18,7 @@ async function Catalog({ searchParams }: { searchParams: Promise<Params> }) {
     const next = new URLSearchParams(Object.entries({ categoria, mascota, q, ...change }).filter(([, v]) => v) as [string, string][]);
     return `/tienda${next.size ? `?${next}` : ""}`;
   };
-  const chip = (on: boolean) => `rounded-full border px-3 py-1 text-sm ${on ? "bg-black text-white" : "hover:bg-neutral-100"}`;
+  const chip = (on: boolean) => `rounded-full border px-3 py-1 text-sm ${on ? "bg-cafe hover:bg-cafe-oscuro text-white" : "hover:bg-crema"}`;
 
   return (
     <div className="flex flex-col gap-4">

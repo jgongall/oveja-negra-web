@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/auth";
+import { parseCsv } from "@/lib/csv";
 import { createClient } from "@/lib/supabase/server";
 import { ORDER_STATUS, SIZES, type OrderStatus } from "@/lib/types";
 
@@ -144,4 +145,77 @@ export async function deleteImage(imageId: number) {
     await supabase.storage.from("productos").remove([data.path]);
     revalidatePath(`/admin/productos/${data.product_id}`);
   }
+}
+
+// ------------------------------------------------------------------ importar catálogo (CSV)
+
+// Una fila por variante; las filas con el mismo nombre (slug) forman un producto.
+const CatalogRow = z.object({
+  nombre: z.string().min(1, "falta el nombre").max(120),
+  descripcion: z.string().max(5000).default(""),
+  categoria: z.string().min(1, "falta la categoría"),
+  mascota: z.string().transform((s) => s.toLowerCase() || "ambos").pipe(z.enum(["perro", "gato", "ambos"], "mascota debe ser perro, gato o ambos")),
+  precio: z.string().transform((s) => Number(s.replace(/[$.\s]/g, "").replace(",", "."))).pipe(z.number("precio inválido").min(0)),
+  talla: z.string().transform((s) => s.toUpperCase()).pipe(z.enum(SIZES, `talla debe ser ${SIZES.join(", ")}`)),
+  color: z.string().max(40).default(""),
+  sku: z.string().max(60).default(""),
+  stock: z.string().transform((s) => Number(s || 0)).pipe(z.number("stock inválido").int().min(0)),
+  activo: z.string().transform((s) => !["no", "0", "false"].includes(s.toLowerCase())).default(true),
+});
+
+export type ImportResult = { error?: string; errors?: string[]; message?: string };
+
+/**
+ * Crea o actualiza productos (por slug) y sus variantes (por talla+color) desde el texto de un CSV.
+ * Si alguna fila tiene errores no se escribe nada. No borra productos ni variantes que no vengan en el archivo.
+ */
+export async function importCatalog(csv: string): Promise<ImportResult> {
+  await requireAdmin();
+  const rows = parseCsv(csv);
+  if (rows.length === 0) return { error: "El archivo está vacío o no tiene cabecera." };
+  if (rows.length > 2000) return { error: "Máximo 2000 filas por archivo." };
+
+  const supabase = await createClient();
+  const { data: cats } = await supabase.from("categories").select("id, slug, name");
+  const catId = new Map<string, number>();
+  for (const c of cats ?? []) { catId.set(c.slug, c.id); catId.set(slugify(c.name), c.id); }
+
+  const errors: string[] = [];
+  const products = new Map<string, { row: z.output<typeof CatalogRow>; variants: z.output<typeof CatalogRow>[] }>();
+  rows.forEach((raw, i) => {
+    const line = i + 2; // +1 cabecera, +1 base 1
+    const parsed = CatalogRow.safeParse(raw);
+    if (!parsed.success) return void errors.push(`Fila ${line}: ${parsed.error.issues.map((x) => x.message).join("; ")}`);
+    const r = parsed.data;
+    if (!catId.has(slugify(r.categoria))) return void errors.push(`Fila ${line}: la categoría "${r.categoria}" no existe`);
+    const slug = slugify(r.nombre);
+    const p = products.get(slug) ?? { row: r, variants: [] };
+    if (p.variants.some((v) => v.talla === r.talla && v.color.toLowerCase() === r.color.toLowerCase())) {
+      return void errors.push(`Fila ${line}: talla ${r.talla} / color "${r.color}" repetida para "${r.nombre}"`);
+    }
+    p.variants.push(r);
+    products.set(slug, p);
+  });
+  if (errors.length) return { error: "No se importó nada: corrige el archivo.", errors: errors.slice(0, 50) };
+
+  // La primera fila de cada producto define nombre, descripción, categoría, mascota, precio y visibilidad.
+  const { data: saved, error } = await supabase.from("products").upsert(
+    [...products].map(([slug, { row: r }]) => ({
+      slug, name: r.nombre, description: r.descripcion, category_id: catId.get(slugify(r.categoria))!,
+      pet: r.mascota, price: r.precio, active: r.activo, updated_at: new Date().toISOString(),
+    })), { onConflict: "slug" }).select("id, slug");
+  if (error || !saved) return { error: error?.message ?? "No se pudieron guardar los productos." };
+
+  const idBySlug = new Map(saved.map((p) => [p.slug, p.id]));
+  const { error: vError } = await supabase.from("product_variants").upsert(
+    [...products].flatMap(([slug, { variants }]) => variants.map((v) => ({
+      product_id: idBySlug.get(slug)!, size: v.talla, color: v.color, sku: v.sku || null, stock: v.stock,
+    }))), { onConflict: "product_id,size,color" });
+  if (vError) {
+    return { error: vError.code === "23505" ? "Hay un SKU repetido con otro producto." : vError.message };
+  }
+
+  revalidatePath("/admin/productos");
+  const variantCount = [...products.values()].reduce((n, p) => n + p.variants.length, 0);
+  return { message: `Listo: ${products.size} productos y ${variantCount} variantes importados.` };
 }

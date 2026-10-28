@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Finalizar compra" };
 
 async function Checkout() {
   const session = await getSession(); // el proxy ya exige sesión en /checkout
-  return <CheckoutForm fullName={session?.profile?.full_name ?? ""} phone={session?.profile?.phone ?? ""} />;
+  return <CheckoutForm profile={session?.profile ?? null} />;
 }
 
 export default function CheckoutPage() {

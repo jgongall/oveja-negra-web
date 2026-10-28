@@ -22,14 +22,14 @@ async function Orders({ searchParams }: { searchParams: Promise<{ estado?: strin
         ))}
       </div>
       <table className="w-full text-sm">
-        <thead className="text-left text-neutral-500">
+        <thead className="text-left text-cafe/70">
           <tr><th className="py-2">Fecha</th><th>Cliente</th><th>Ciudad</th><th>Total</th><th>Estado</th></tr>
         </thead>
         <tbody className="divide-y">
           {orders.map((o) => (
             <tr key={o.id}>
               <td className="py-2"><Link href={`/pedido/${o.id}`} className="hover:underline">{dateTime(o.created_at)}</Link></td>
-              <td>{o.full_name}<div className="text-xs text-neutral-500">{o.email} · {o.phone}</div></td>
+              <td>{o.full_name}<div className="text-xs text-cafe/70">{o.email} · {o.phone}</div></td>
               <td>{o.shipping_address.city}</td>
               <td>{money(o.total)}</td>
               <td><OrderStatusSelect orderId={o.id} status={o.status as OrderStatus} /></td>
@@ -37,7 +37,7 @@ async function Orders({ searchParams }: { searchParams: Promise<{ estado?: strin
           ))}
         </tbody>
       </table>
-      {orders.length === 0 && <p className="text-neutral-500">No hay pedidos.</p>}
+      {orders.length === 0 && <p className="text-cafe/70">No hay pedidos.</p>}
     </>
   );
 }

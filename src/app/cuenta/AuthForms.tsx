@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { signIn, signUp, type FormState } from "./actions";
+import { ProfileFields } from "./ProfileFields";
 
 const input = "w-full rounded border px-3 py-2";
 
@@ -24,13 +25,13 @@ function AuthForm({ mode, next }: { mode: "in" | "up"; next: string }) {
   return (
     <form action={action} className="flex flex-col gap-3">
       <input type="hidden" name="next" value={next} />
-      {mode === "up" && <input name="full_name" placeholder="Nombre" required className={input} />}
       <input name="email" type="email" placeholder="Correo" required autoComplete="email" className={input} />
       <input name="password" type="password" placeholder="Contraseña" required minLength={mode === "up" ? 8 : undefined}
         autoComplete={mode === "in" ? "current-password" : "new-password"} className={input} />
+      {mode === "up" && <ProfileFields />}
       {state.error && <p className="text-sm text-red-600">{state.error}</p>}
       {state.message && <p className="text-sm text-green-700">{state.message}</p>}
-      <button disabled={pending} className="rounded bg-black px-4 py-2 text-white disabled:opacity-50">
+      <button disabled={pending} className="rounded bg-cafe hover:bg-cafe-oscuro px-4 py-2 text-white disabled:opacity-50">
         {mode === "in" ? "Ingresar" : "Crear cuenta"}
       </button>
     </form>

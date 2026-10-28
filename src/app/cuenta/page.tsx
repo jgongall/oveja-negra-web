@@ -28,12 +28,12 @@ async function Account({ searchParams }: { searchParams: Promise<{ next?: string
       </div>
       <section>
         <h2 className="mb-2 font-semibold">Mis datos</h2>
-        <p className="mb-3 text-sm text-neutral-600">{session.user.email}</p>
-        <ProfileForm fullName={session.profile?.full_name ?? ""} phone={session.profile?.phone ?? ""} />
+        <p className="mb-3 text-sm text-cafe/70">{session.user.email}</p>
+        <ProfileForm profile={session.profile} />
       </section>
       <section>
         <h2 className="mb-2 font-semibold">Mis pedidos</h2>
-        {orders.length === 0 && <p className="text-neutral-500">Todavía no tienes pedidos.</p>}
+        {orders.length === 0 && <p className="text-cafe/70">Todavía no tienes pedidos.</p>}
         <ul className="divide-y">
           {orders.map((o) => (
             <li key={o.id} className="flex justify-between py-2">

@@ -1,0 +1,4 @@
+nombre;descripcion;categoria;mascota;precio;talla;color;sku;stock;activo
+Impermeable Lluvia;Impermeable con capucha y forro;Impermeables;perro;14990;S;Amarillo;IMP-LLU-S-AMA;5;si
+Impermeable Lluvia;Impermeable con capucha y forro;Impermeables;perro;14990;M;Amarillo;IMP-LLU-M-AMA;3;si
+Polar Nube;Polar suave para el frío;Polars;ambos;11990;XS;Gris;POL-NUB-XS-GRI;8;si

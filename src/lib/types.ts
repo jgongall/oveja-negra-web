@@ -1,9 +1,11 @@
 // Tipos de las tablas (a mano; se pueden generar con `npx supabase gen types typescript`).
 
-export const SIZES = ["XS", "S", "M", "L", "XL", "XXL", "Única"] as const;
+export const SIZES = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"] as const;
 export type Size = (typeof SIZES)[number];
 export const PETS = { perro: "Perro", gato: "Gato", ambos: "Perro y gato" } as const;
 export type Pet = keyof typeof PETS;
+export const CUSTOMER_TIERS = { basico: "Básico", habitual: "Habitual", super: "Súper" } as const;
+export type CustomerTier = keyof typeof CUSTOMER_TIERS;
 export const ORDER_STATUS = {
   pendiente: "Pendiente de pago", pagado: "Pagado", enviado: "Enviado", entregado: "Entregado", cancelado: "Cancelado",
 } as const;
@@ -40,4 +42,7 @@ export type OrderItem = {
   unit_price: number; quantity: number;
 };
 
-export type Profile = { id: string; full_name: string; phone: string; role: "cliente" | "admin" };
+export type Profile = {
+  id: string; full_name: string; age: number | null; customer_tier: CustomerTier; address: string; city: string;
+  region: string; phone: string; role: "cliente" | "admin";
+};
