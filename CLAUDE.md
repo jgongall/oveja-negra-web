@@ -46,3 +46,7 @@ No hay tests automatizados.
 - Las páginas no pueden exportar nada más que lo permitido por Next: utilidades compartidas van en `src/lib` o `src/components`.
 - Supabase devuelve `numeric` como string o number según el caso: convertir con `Number()` antes de calcular.
 - Mercado Pago rechaza `back_urls`/`notification_url` en localhost; `createCheckout` los omite en dev.
+
+## Estado del proyecto
+
+@docs/CONTEXTO.md (historial, decisiones del usuario, pendientes). Actualízalo al terminar cada bloque de trabajo.
