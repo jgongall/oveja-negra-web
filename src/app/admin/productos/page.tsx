@@ -11,7 +11,7 @@ async function Products() {
   const products = (data ?? []) as (Product & { product_variants: Pick<Variant, "stock">[]; categories: { name: string } | null })[];
 
   return (
-    <table className="w-full text-sm">
+    <div className="overflow-x-auto"><table className="w-full text-sm min-w-[560px]">
       <thead className="text-left text-cafe/70">
         <tr><th className="py-2">Producto</th><th>Categoría</th><th>Precio</th><th>Stock</th><th>Estado</th></tr>
       </thead>
@@ -26,7 +26,7 @@ async function Products() {
           </tr>
         ))}
       </tbody>
-    </table>
+    </table></div>
   );
 }
 

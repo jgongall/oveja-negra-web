@@ -39,12 +39,15 @@ Resumen para retomar el trabajo en una sesión nueva. Complementa `CLAUDE.md` (a
 
 ## Qué falta / no verificado
 
-- **Nada se ha probado contra Supabase real**: las claves ya están en `.env.local`; falta
-  **aplicar la migración** (SQL Editor o `npx supabase db push`). Después, crear el primer admin con el `update` del README.
+- Supabase: migración aplicada (28-10-2026) y admin creado (jorge.g.gallerstein@gmail.com). Registro probado.
+  Falta probar: importar catálogo, fotos, compra. Aún no hay productos.
+- `createClient()` llama a `connection()` (supabase-js usa `Date.now()`; sin esto, error "blocking route" en prerender).
 - Mercado Pago sin credenciales: los pedidos quedan "pendientes". Para probar el webhook en local hace falta un túnel.
 - Identidad visual aplicada con los assets del usuario (`public/marca`: logo, íconos, carrusel, patrón; favicon en
-  `src/app/icon.svg`). Paleta en `globals.css` (café, rosa, oliva, crema). `public/marca/productos/*.svg` aún sin usar.
-  Redes del pie: `NEXT_PUBLIC_INSTAGRAM_URL` y `NEXT_PUBLIC_WHATSAPP` (vacías).
+  `src/app/icon.svg`). Paleta en `globals.css` (café, rosa, oliva, crema). Portada según el mockup del usuario
+  (header oliva, carrusel, "Nuestros favoritos" con filtro, beneficios, pie oliva). Si no hay destacados, muestra
+  tarjetas de muestra con `public/marca/productos/*.svg`. Falta: favoritos (corazones del mockup), resto de páginas al estilo nuevo.
+  Contacto del pie: `NEXT_PUBLIC_INSTAGRAM_URL`, `NEXT_PUBLIC_WHATSAPP`, `NEXT_PUBLIC_CONTACT_EMAIL` (vacías).
 - Ideas no implementadas: compra como invitado, reserva de stock al crear el pedido, costo de envío, cupones,
   correos de confirmación de pedido, tipos generados con `npx supabase gen types`, tests.
 - Hay una carpeta vacía `F:\oveja-negra-web` sobrante (create-next-app no acepta mayúsculas); el usuario debe borrarla.

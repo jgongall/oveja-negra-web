@@ -1,79 +1,86 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
+import { HeroCarousel } from "@/components/HeroCarousel";
 import { Icon, type IconName } from "@/components/Icon";
-import { ProductGrid } from "@/components/ProductCard";
-import { getCategories, getProducts } from "@/lib/catalog";
+import { ProductCardView, ProductGrid } from "@/components/ProductCard";
+import { getProducts } from "@/lib/catalog";
 
-const slides = [
-  { src: "/marca/carrusel/gato-sueter.svg", alt: "Gato negro con suéter rosa", title: "Abrigaditos y regalones",
-    text: "Polars y camisas para los días fríos.", href: "/tienda?categoria=polars" },
-  { src: "/marca/carrusel/paquete-envio.svg", alt: "Paquete de envío", title: "Enviamos a todo Chile",
-    text: "Compra online y recíbelo en tu casa.", href: "/tienda" },
+// Ilustraciones de muestra (public/marca/productos) mientras la tienda no tiene productos destacados.
+const samples = [
+  { name: "Polerón tejido oliva", pet: "Perros", image: "poleron-tejido" },
+  { name: "Suéter cuello alto", pet: "Gatos", image: "sueter-cuello-alto" },
+  { name: "Chaleco acolchado", pet: "Perros", image: "chaleco-acolchado" },
+  { name: "Bandana rosa pastel", pet: "Gatos", image: "bandana-rosa" },
+  { name: "Impermeable con capucha", pet: "Perros", image: "impermeable" },
+  { name: "Collar con cascabel", pet: "Gatos", image: "collar-cascabel" },
 ];
 
 const perks: { icon: IconName; title: string; text: string }[] = [
-  { icon: "envio", title: "Envíos", text: "A todo el país" },
-  { icon: "tallas", title: "Tallas XS a XXXL", text: "Para cada perrito y gatito" },
-  { icon: "regalo", title: "Ideal para regalar", text: "Hecho con cariño" },
+  { icon: "tallas", title: "Tallas para todos", text: "Desde gatitos hasta perros grandes." },
+  { icon: "huella", title: "Telas suaves", text: "Cómodas para jugar y dormir." },
+  { icon: "envio", title: "Envíos", text: "A todo Chile." },
 ];
 
-/** Carrusel simple con scroll-snap (sin JavaScript): se desliza con el dedo o la barra. */
-function Carousel() {
-  return (
-    <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2">
-      {slides.map((s) => (
-        <Link key={s.src} href={s.href}
-          className="patron-huellas flex w-full shrink-0 snap-center items-center gap-6 rounded-2xl p-6 sm:p-10">
-          <Image src={s.src} alt={s.alt} width={240} height={240} className="h-32 w-32 sm:h-60 sm:w-60" />
-          <div>
-            <h2 className="text-2xl font-extrabold text-cafe sm:text-4xl">{s.title}</h2>
-            <p className="mt-2 text-cafe/80">{s.text}</p>
-            <span className="mt-4 inline-block rounded-full bg-cafe px-5 py-2 text-sm font-semibold text-white">Ver más</span>
-          </div>
-        </Link>
-      ))}
-    </div>
-  );
-}
+const filters = [
+  { key: "", label: "Todos" }, { key: "perro", label: "Perros" }, { key: "gato", label: "Gatos" },
+];
 
-async function Featured() {
-  const [products, categories] = await Promise.all([getProducts({ featured: true }), getCategories()]);
+async function Favorites({ searchParams }: { searchParams: Promise<{ mascota?: string }> }) {
+  const { mascota = "" } = await searchParams;
+  const products = await getProducts({ featured: true, pet: mascota });
   return (
     <>
-      <div className="flex flex-wrap gap-2">
-        <Link href="/tienda?mascota=perro" className="flex items-center gap-1 rounded-full bg-rosa px-4 py-1 text-sm font-semibold text-cafe">
-          <Icon name="perro" size={18} /> Perritos
-        </Link>
-        <Link href="/tienda?mascota=gato" className="flex items-center gap-1 rounded-full bg-rosa px-4 py-1 text-sm font-semibold text-cafe">
-          <Icon name="gato" size={18} /> Gatitos
-        </Link>
-        {categories.map((c) => (
-          <Link key={c.id} href={`/tienda?categoria=${c.slug}`}
-            className="rounded-full border border-cafe/30 px-4 py-1 text-sm text-cafe hover:bg-crema">
-            {c.name}
-          </Link>
-        ))}
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="font-script text-lg text-cafe">hecho con cariño</p>
+          <h2 className="text-3xl font-extrabold text-oliva-oscuro">Nuestros favoritos</h2>
+        </div>
+        <div className="flex gap-2">
+          {filters.map((f) => (
+            <Link key={f.label} href={f.key ? `/?mascota=${f.key}` : "/"} scroll={false}
+              className={`flex items-center gap-1 rounded-full border-2 border-cafe px-3 py-1 text-xs font-bold text-cafe ${mascota === f.key ? "bg-rosa" : "bg-white hover:bg-rosa-claro"}`}>
+              <Icon name="huella" size={14} /> {f.label}
+            </Link>
+          ))}
+        </div>
       </div>
-      <h2 className="mt-4 flex items-center gap-2 text-xl font-bold text-cafe"><Icon name="estrella" /> Destacados</h2>
-      <ProductGrid products={products} />
+      <div className="mt-6">
+        {products.length > 0 ? <ProductGrid products={products} /> : (
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+            {samples.filter((s) => !mascota || s.pet === (mascota === "perro" ? "Perros" : "Gatos")).map((s) => (
+              <ProductCardView key={s.image} href="/tienda" name={s.name} pet={s.pet} sizes={["XS", "S", "M", "L"]}
+                image={`/marca/productos/${s.image}.svg`} price="Próximamente" />
+            ))}
+          </div>
+        )}
+      </div>
     </>
   );
 }
 
-export default function Home() {
+export default function Home(props: PageProps<"/">) {
   return (
-    <div className="flex flex-col gap-8">
-      <Carousel />
-      <div className="grid gap-4 sm:grid-cols-3">
-        {perks.map((p) => (
-          <div key={p.icon} className="flex items-center gap-3 rounded-xl bg-rosa-claro p-4 text-cafe">
-            <Icon name={p.icon} size={36} />
-            <div><div className="font-bold">{p.title}</div><div className="text-sm">{p.text}</div></div>
-          </div>
-        ))}
+    // La portada ocupa todo el ancho: sale del contenedor de <main> (margen negativo de medio viewport).
+    <div className="relative left-1/2 -my-8 w-screen -translate-x-1/2">
+      <HeroCarousel />
+      <div className="mx-auto max-w-6xl px-4 py-10">
+        <Suspense fallback={<p>Cargando…</p>}>
+          <Favorites searchParams={props.searchParams as Promise<{ mascota?: string }>} />
+        </Suspense>
+        <div className="mt-12 grid gap-4 sm:grid-cols-3">
+          {perks.map((p) => (
+            <div key={p.title} className="flex items-center gap-3 rounded-2xl border-2 border-cafe bg-oliva-claro p-4">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-cafe bg-rosa">
+                <Icon name={p.icon} size={20} />
+              </span>
+              <div>
+                <div className="text-sm font-extrabold text-oliva-oscuro">{p.title}</div>
+                <div className="text-xs text-cafe">{p.text}</div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
-      <Suspense fallback={<p>Cargando…</p>}><Featured /></Suspense>
     </div>
   );
 }

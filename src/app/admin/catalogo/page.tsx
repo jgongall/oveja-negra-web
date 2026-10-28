@@ -14,7 +14,7 @@ export default function CatalogImportPage() {
         (precio, stock, etc.); lo que no venga en el archivo no se toca. Las fotos se suben después en cada producto.
       </p>
       <a href="/plantilla-catalogo.csv" download className="self-start text-sm underline">Descargar plantilla de ejemplo</a>
-      <table className="text-left text-sm">
+      <div className="overflow-x-auto"><table className="text-left text-sm min-w-[560px]">
         <thead className="text-cafe/70"><tr><th className="pr-4">Columna</th><th>Valor</th></tr></thead>
         <tbody>
           <tr><td className="pr-4 font-mono">nombre</td><td>Obligatorio</td></tr>
@@ -28,7 +28,7 @@ export default function CatalogImportPage() {
           <tr><td className="pr-4 font-mono">stock</td><td>Número entero (vacío = 0)</td></tr>
           <tr><td className="pr-4 font-mono">activo</td><td>si / no (vacío = si)</td></tr>
         </tbody>
-      </table>
+      </table></div>
       <ImportForm />
     </div>
   );

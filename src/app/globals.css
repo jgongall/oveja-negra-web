@@ -7,11 +7,14 @@
   --color-rosa: #f4c2c9;
   --color-rosa-claro: #f9ecec;
   --color-oliva: #6b7a3a;
+  --color-oliva-oscuro: #4f5a24;
+  --color-oliva-claro: #e7e9d3;
   --color-crema: #f5f3ea;
   --color-dorado: #d9a54a;
-  --color-background: #ffffff;
+  --color-background: var(--color-crema);
   --color-foreground: var(--color-cafe-oscuro);
   --font-sans: var(--font-nunito);
+  --font-script: var(--font-dancing);
 }
 
 body {
@@ -19,9 +22,14 @@ body {
   color: var(--color-foreground);
 }
 
-/* Fondo con huellas para secciones destacadas. */
+/* Fondos con huellas. */
 .patron-huellas {
   background-color: var(--color-crema);
   background-image: url("/marca/patron/patron-huellas-crema.svg");
+  background-size: 240px;
+}
+.patron-huellas-oliva {
+  background-color: var(--color-oliva);
+  background-image: url("/marca/patron/patron-huellas-oliva.svg");
   background-size: 240px;
 }

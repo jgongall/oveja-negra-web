@@ -21,7 +21,7 @@ async function Orders({ searchParams }: { searchParams: Promise<{ estado?: strin
           <Link key={k} href={`/admin?estado=${k}`} className={estado === k ? "font-semibold underline" : "hover:underline"}>{label}</Link>
         ))}
       </div>
-      <table className="w-full text-sm">
+      <div className="overflow-x-auto"><table className="w-full text-sm min-w-[560px]">
         <thead className="text-left text-cafe/70">
           <tr><th className="py-2">Fecha</th><th>Cliente</th><th>Ciudad</th><th>Total</th><th>Estado</th></tr>
         </thead>
@@ -36,7 +36,7 @@ async function Orders({ searchParams }: { searchParams: Promise<{ estado?: strin
             </tr>
           ))}
         </tbody>
-      </table>
+      </table></div>
       {orders.length === 0 && <p className="text-cafe/70">No hay pedidos.</p>}
     </>
   );

@@ -2,10 +2,13 @@ import "server-only";
 import { createServerClient } from "@supabase/ssr";
 import { createClient as createAdminClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
+import { connection } from "next/server";
 import { env, serverEnv } from "@/lib/env";
 
 /** Cliente del usuario actual (respeta RLS). Para componentes de servidor, acciones y rutas. */
 export async function createClient() {
+  // supabase-js usa Date.now() (expiración del token): renderizar en la petición, no en el prerender.
+  await connection();
   const store = await cookies();
   return createServerClient(env.supabaseUrl, env.supabaseKey, {
     cookies: {
