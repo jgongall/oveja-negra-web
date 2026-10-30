@@ -1,4 +1,4 @@
-# Contexto del proyecto (estado al 27-10-2026)
+# Contexto del proyecto (estado al 30-10-2026)
 
 Resumen para retomar el trabajo en una sesión nueva. Complementa `CLAUDE.md` (arquitectura) y `README.md` (puesta en marcha).
 
@@ -11,7 +11,7 @@ Resumen para retomar el trabajo en una sesión nueva. Complementa `CLAUDE.md` (a
   - Stack: **Next.js + Supabase** (despliegue previsto en Vercel).
   - Pagos: **Mercado Pago** (Checkout Pro).
   - Primera versión: **catálogo y carrito, cuentas de clientes y panel de administración**.
-  - **"El diseño lo vemos después, arma la estructura"**: el estilo actual es Tailwind básico y provisional.
+  - Diseño: la portada sigue el mockup del usuario y usa sus assets (ver "Qué falta").
   - Carpeta: `F:\ovejaNegraWeb`, repositorio git propio.
   - Ropa para **perritos y gatitos**. Categorías: **Impermeables, Camisas, Polars, Disfraces**. Tallas **XS–XXXL**.
   - Perfil del cliente: nombre completo, edad, rango de cliente (básico, habitual, súper), dirección, ciudad,
@@ -24,7 +24,7 @@ Resumen para retomar el trabajo en una sesión nueva. Complementa `CLAUDE.md` (a
   - Comprar exige cuenta (sin compra como invitado).
   - El stock se descuenta al confirmarse el pago, no al crear el pedido (no hay reserva de stock).
 
-## Qué está hecho (commit `ae36762`, rama `main`)
+## Qué está hecho (rama `main`, en GitHub: https://github.com/jgongall/oveja-negra-web)
 
 - Proyecto Next.js 16.4 (React 19, Tailwind 4, `cacheComponents`), dependencias `@supabase/ssr`,
   `@supabase/supabase-js`, `mercadopago`, `zod`, `server-only`.
@@ -54,5 +54,5 @@ Resumen para retomar el trabajo en una sesión nueva. Complementa `CLAUDE.md` (a
 
 ## Próximo paso sugerido
 
-Pedir al usuario las claves de Supabase, aplicar la migración, levantar `npm run dev` y probar de punta a punta:
-registro → admin → crear producto con fotos → comprar → pedido pendiente.
+Con la cuenta admin: importar un catálogo de prueba con la plantilla CSV, subir fotos, marcar destacados y probar
+una compra hasta el pedido pendiente. Pendientes de diseño: favoritos y resto de páginas al estilo de la portada.
